@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChemBalance - Learn Chemical Equations</title>
+    <style>
+        :root {
+            --primary-color: #2c8d8d;
+            --secondary-color: #5ab9b9;
+            --background-color: #f0f8ff;
+            --text-color: #333;
+            --correct-color: #4caf50;
+            --incorrect-color: #f44336;
+            --highlight-color: #ffffcc;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+            animation: fadeIn 0.5s;
+        }
+        
+        .page.active {
+            display: flex;
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+            align-self: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .example {
+            background-color: var(--highlight-color);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .equation-container {
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 30px 0;
+            line-height: 1.8;
+        }
+        
+        .coefficient {
+            display: inline-block;
+            width: 40px;
+            text-align: center;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        
+        .coefficient-input {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--secondary-color);
+            border-radius: 5px;
+        }
+        
+        .molecule {
+            display: inline-block;
+            margin: 0 5px;
+        }
+        
+        .feedback {
+            min-height: 50px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .score {
+            font-size: 1.2rem;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .summary {
+            margin: 20px 0;
+        }
+        
+        .equation-list {
+            list-style-type: none;
+            margin-top: 10px;
+        }
+        
+        .equation-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: var(--highlight-color);
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .learning-material {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e8f5f5;
+            border-radius: 5px;
+        }
+        
+        .fun-fact {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e0f7fa;
+            border-radius: 5px;
+            font-style: italic;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .equation-container {
+                font-size: 1.4rem;
+            }
+            
+            .coefficient-input {
+                width: 35px;
+                height: 35px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ChemBalance</h1>
+        <h2>Master Chemical Equation Balancing</h2>
+    </header>
+    
+    <div class="container">
+        <!-- Page 1: Introduction -->
+        <div id="intro-page" class="page active">
+            <h2>Welcome to ChemBalance!</h2>
+            <p>Chemical equations need to be balanced to follow the Law of Conservation of Mass. This means that the number of atoms of each element must be the same on both sides of the equation.</p>
+            
+            <p>In this game, you'll practice balancing chemical equations by selecting the correct coefficients for each compound.</p>
+            
+            <div class="example">
+                <p>Unbalanced: H₂ + O₂ → H₂O</p>
+                <p>Balanced: 2H₂ + O₂ → 2H₂O</p>
+            </div>
+            
+            <h3>How to Play:</h3>
+            <ol>
+                <li>You'll be shown an unbalanced chemical equation</li>
+                <li>Click the dropdown menus to select coefficients for each compound</li>
+                <li>Press "Check Balance" to verify your answer</li>
+                <li>Balance 5 equations to complete the game</li>
+            </ol>
+            
+            <button id="start-btn" class="btn">Start Game</button>
+        </div>
+        
+        <!-- Page 2: Game Screen -->
+        <div id="game-page" class="page">
+            <div class="score">Score: <span id="score">0</span></div>
+            
+            <div class="equation-container" id="equation-display">
+                <!-- Equation will be inserted here by JavaScript -->
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <button id="check-btn" class="btn">Check Balance</button>
+            <button id="next-btn" class="btn" style="display:none;">Next Equation</button>
+            <button id="complete-btn" class="btn" style="display:none;">Complete Game</button>
+        </div>
+        
+        <!-- Page 3: Results & Summary -->
+        <div id="results-page" class="page">
+            <h2>Congratulations!</h2>
+            <p>You've completed the ChemBalance game with a score of <span id="final-score">0</span>.</p>
+            
+            <div class="summary">
+                <h3>Equations you balanced:</h3>
+                <ul class="equation-list" id="balanced-equations">
+                    <!-- Balanced equations will be inserted here -->
+                </ul>
+            </div>
+            
+            <div class="learning-material">
+                <h3>Understanding Chemical Equations:</h3>
+                <p>Chemical equations represent chemical reactions where:</p>
+                <ul>
+                    <li>Reactants are on the left side of the arrow (→)</li>
+                    <li>Products are on the right side</li>
+                    <li>Coefficients (numbers in front of compounds) show how many molecules participate</li>
+                    <li>Subscripts (small numbers inside formulas) indicate how many atoms are in each molecule</li>
+                </ul>
+                <p>Remember: Atoms are never created or destroyed in chemical reactions, only rearranged!</p>
+            </div>
+            
+            <div class="fun-fact" id="fun-fact">
+                <!-- Fun fact will be inserted here -->
+            </div>
+            
+            <button id="play-again-btn" class="btn">Play Again</button>
+        </div>
+    </div>
+    
+    <footer>
+        <p>ChemBalance - Learn Chemical Equations | Created with 💡 for Chemistry Students</p>
+    </footer>
+    
+    <script>
+        // Game data
+        const equations = [
+            {
+                equation: "H₂ + O₂ → H₂O",
+                correctCoefficients: [2, 1, 2],
+                difficulty: 1
+            },
+            {
+                equation: "Na + Cl₂ → NaCl",
+                correctCoefficients: [2, 1, 2],
+                difficulty: 1
+            },
+            {
+                equation: "Fe + O₂ → Fe₂O₃",
+                correctCoefficients: [4, 3, 2],
+                difficulty: 2
+            },
+            {
+                equation: "C₃H₈ + O₂ → CO₂ + H₂O",
+                correctCoefficients: [1, 5, 3, 4],
+                difficulty: 2
+            },
+            {
+                equation: "CH₄ + O₂ → CO₂ + H₂O",
+                correctCoefficients: [1, 2, 1, 2],
+                difficulty: 1
+            },
+            {
+                equation: "Al + HCl → AlCl₃ + H₂",
+                correctCoefficients: [2, 6, 2, 3],
+                difficulty: 2
+            },
+            {
+                equation: "NaOH + H₂SO₄ → Na₂SO₄ + H₂O",
+                correctCoefficients: [2, 1, 1, 2],
+                difficulty: 2
+            },
+            {
+                equation: "KClO₃ → KCl + O₂",
+                correctCoefficients: [2, 2, 3],
+                difficulty: 2
+            },
+            {
+                equation: "Cu + AgNO₃ → Cu(NO₃)₂ + Ag",
+                correctCoefficients: [1, 2, 1, 2],
+                difficulty: 2
+            },
+            {
+                equation: "Zn + HCl → ZnCl₂ + H₂",
+                correctCoefficients: [1, 2, 1, 1],
+                difficulty: 1
+            },
+            {
+                equation: "C₂H₄ + O₂ → CO₂ + H₂O",
+                correctCoefficients: [1, 3, 2, 2],
+                difficulty: 3
+            },
+            {
+                equation: "NH₃ + O₂ → NO + H₂O",
+                correctCoefficients: [4, 5, 4, 6],
+                difficulty: 3
+            },
+            {
+                equation: "KMnO₄ + HCl → KCl + MnCl₂ + H₂O + Cl₂",
+                correctCoefficients: [2, 16, 2, 2, 8, 5],
+                difficulty: 3
+            },
+            {
+                equation: "C₆H₁₂O₆ + O₂ → CO₂ + H₂O",
+                correctCoefficients: [1, 6, 6, 6],
+                difficulty: 2
+            },
+            {
+                equation: "Al₂O₃ + C → Al + CO",
+                correctCoefficients: [1, 3, 2, 3],
+                difficulty: 2
+            }
+        ];
+
+        const funFacts = [
+            "The chemical equation for photosynthesis (6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂) shows how plants convert carbon dioxide and water into glucose and oxygen using sunlight!",
+            "When balancing combustion reactions, remember that oxygen (O₂) is always a reactant, while CO₂ and H₂O are typically products.",
+            "The world's most important chemical reaction might be nitrogen fixation: N₂ + 3H₂ → 2NH₃, which allows us to create fertilizers that feed billions of people.",
+            "Antoine Lavoisier, who first stated the Law of Conservation of Mass in 1789, is often called the 'Father of Modern Chemistry.'",
+            "The chemical reaction for rusting is: 4Fe + 3O₂ → 2Fe₂O₃. This same compound gives Mars its reddish color!",
+            "Baking soda and vinegar create the famous 'volcano' reaction: NaHCO₃ + CH₃COOH → CO₂ + H₂O + CH₃COONa",
+            "Water is formed through the highly exothermic reaction: 2H₂ + O₂ → 2H₂O, which releases 572 kJ of energy per mole of water formed.",
+            "Fireworks get their colors from different metal salts. Copper compounds create blue, strontium creates red, and barium creates green!",
+            "Your body uses the reaction C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O to extract energy from food during cellular respiration.",
+            "Catalysts can dramatically speed up chemical reactions without being consumed. Enzymes are biological catalysts that make life possible!"
+        ];
+
+        // Game state
+        let currentEquationIndex = 0;
+        let currentEquation = null;
+        let score = 0;
+        let balancedEquations = [];
+        let usedEquations = [];
+
+        // DOM Elements
+        const introPage = document.getElementById('intro-page');
+        const gamePage = document.getElementById('game-page');
+        const resultsPage = document.getElementById('results-page');
+        const startBtn = document.getElementById('start-btn');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const completeBtn = document.getElementById('complete-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const equationDisplay = document.getElementById('equation-display');
+        const feedbackElement = document.getElementById('feedback');
+        const scoreElement = document.getElementById('score');
+        const finalScoreElement = document.getElementById('final-score');
+        const balancedEquationsList = document.getElementById('balanced-equations');
+        const funFactElement = document.getElementById('fun-fact');
+
+        // Event listeners
+        startBtn.addEventListener('click', startGame);
+        checkBtn.addEventListener('click', checkBalance);
+        nextBtn.addEventListener('click', nextEquation);
+        completeBtn.addEventListener('click', showResults);
+        playAgainBtn.addEventListener('click', restartGame);
+
+        // Start the game
+        function startGame() {
+            showPage(gamePage);
+            score = 0;
+            balancedEquations = [];
+            usedEquations = [];
+            updateScore();
+            selectEquation();
+        }
+
+        // Select a random equation from the list
+        function selectEquation() {
+            // Get available equations (not used yet)
+            const availableEquations = equations.filter(eq => !usedEquations.includes(eq));
+            
+            // If all equations have been used, reset the used list
+            if (availableEquations.length === 0) {
+                usedEquations = [];
+                currentEquation = equations[Math.floor(Math.random() * equations.length)];
+            } else {
+                currentEquation = availableEquations[Math.floor(Math.random() * availableEquations.length)];
+            }
+            
+            usedEquations.push(currentEquation);
+            displayEquation(currentEquation);
+        }
+
+        // Display the current equation
+        function displayEquation(equationData) {
+            // Clear previous equation
+            equationDisplay.innerHTML = '';
+            
+            // Split the equation into compounds
+            const sides = equationData.equation.split(' → ');
+            const reactants = sides[0].split(' + ');
+            const products = sides[1].split(' + ');
+            
+            // Build reactants side
+            reactants.forEach((reactant, index) => {
+                // Add plus sign if not the first reactant
+                if (index > 0) {
+                    equationDisplay.appendChild(document.createTextNode(' + '));
+                }
+                
+                // Create coefficient input
+                const coefficientDiv = document.createElement('div');
+                coefficientDiv.className = 'coefficient';
+                
+                const coefficientInput = document.createElement('select');
+                coefficientInput.className = 'coefficient-input';
+                coefficientInput.dataset.index = index;
+                
+                // Add options 1-9
+                for (let i = 1; i <= 9; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.text = i;
+                    coefficientInput.appendChild(option);
+                }
+                
+                coefficientDiv.appendChild(coefficientInput);
+                equationDisplay.appendChild(coefficientDiv);
+                
+                // Create molecule span
+                const moleculeSpan = document.createElement('span');
+                moleculeSpan.className = 'molecule';
+                moleculeSpan.textContent = reactant;
+                equationDisplay.appendChild(moleculeSpan);
+            });
+            
+            // Add arrow
+            const arrowSpan = document.createElement('span');
+            arrowSpan.textContent = ' → ';
+            equationDisplay.appendChild(arrowSpan);
+            
+            // Build products side
+            products.forEach((product, index) => {
+                // Add plus sign if not the first product
+                if (index > 0) {
+                    equationDisplay.appendChild(document.createTextNode(' + '));
+                }
+                
+                // Create coefficient input
+                const coefficientDiv = document.createElement('div');
+                coefficientDiv.className = 'coefficient';
+                
+                const coefficientInput = document.createElement('select');
+                coefficientInput.className = 'coefficient-input';
+                coefficientInput.dataset.index = reactants.length + index;
+                
+                // Add options 1-9
+                for (let i = 1; i <= 9; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.text = i;
+                    coefficientInput.appendChild(option);
+                }
+                
+                coefficientDiv.appendChild(coefficientInput);
+                equationDisplay.appendChild(coefficientDiv);
+                
+                // Create molecule span
+                const moleculeSpan = document.createElement('span');
+                moleculeSpan.className = 'molecule';
+                moleculeSpan.textContent = product;
+                equationDisplay.appendChild(moleculeSpan);
+            });
+            
+            // Reset feedback and buttons
+            feedbackElement.textContent = '';
+            feedbackElement.style.color = 'var(--text-color)';
+            checkBtn.style.display = 'block';
+            nextBtn.style.display = 'none';
+            completeBtn.style.display = 'none';
+        }
+
+        // Check if the equation is balanced
+        function checkBalance() {
+            const inputs = document.querySelectorAll('.coefficient-input');
+            const userCoefficients = Array.from(inputs).map(input => parseInt(input.value));
+            
+            // Compare with correct coefficients
+            const isCorrect = userCoefficients.every((coef, index) => {
+                return coef === currentEquation.correctCoefficients[index];
+            });
+            
+            if (isCorrect) {
+                // Update score and provide feedback
+                score++;
+                updateScore();
+                
+                feedbackElement.textContent = "Great job! The equation is balanced correctly.";
+                feedbackElement.style.color = 'var(--correct-color)';
+                
+                // Add to balanced equations list
+                const balancedEquation = formatBalancedEquation(currentEquation.equation, currentEquation.correctCoefficients);
+                balancedEquations.push(balancedEquation);
+                
+                // Show appropriate button based on score
+                checkBtn.style.display = 'none';
+                
+                if (score >= 5) {
+                    completeBtn.style.display = 'block';
+                    nextBtn.style.display = 'none';
+                } else {
+                    nextBtn.style.display = 'block';
+                }
+            } else {
+                // Provide helpful feedback
+                feedbackElement.textContent = "Not quite right. Try again! Remember that atoms must be balanced on both sides.";
+                feedbackElement.style.color = 'var(--incorrect-color)';
+                
+                // Provide hint based on difficulty
+                if (currentEquation.difficulty === 1) {
+                    setTimeout(() => {
+                        feedbackElement.textContent += " Hint: Start by balancing the element that appears in the fewest compounds.";
+                    }, 1500);
+                }
+            }
+        }
+
+        // Format a balanced equation with coefficients
+        function formatBalancedEquation(equation, coefficients) {
+            const parts = equation.split(' → ');
+            const reactants = parts[0].split(' + ');
+            const products = parts[1].split(' + ');
+            
+            let formattedEquation = '';
+            
+            // Format reactants
+            reactants.forEach((reactant, index) => {
+                if (index > 0) formattedEquation += ' + ';
+                if (coefficients[index] === 1) {
+                    formattedEquation += reactant;
+                } else {
+                    formattedEquation += coefficients[index] + reactant;
+                }
+            });
+            
+            formattedEquation += ' → ';
+            
+            // Format products
+            products.forEach((product, index) => {
+                if (index > 0) formattedEquation += ' + ';
+                const coefIndex = reactants.length + index;
+                if (coefficients[coefIndex] === 1) {
+                    formattedEquation += product;
+                } else {
+                    formattedEquation += coefficients[coefIndex] + product;
+                }
+            });
+            
+            return formattedEquation;
+        }
+
+        // Move to the next equation
+        function nextEquation() {
+            selectEquation();
+        }
+
+        // Show results page
+        function showResults() {
+            showPage(resultsPage);
+            
+            // Update final score
+            finalScoreElement.textContent = score;
+            
+            // Display balanced equations
+            balancedEquationsList.innerHTML = '';
+            balancedEquations.forEach(equation => {
+                const li = document.createElement('li');
+                li.textContent = equation;
+                balancedEquationsList.appendChild(li);
+            });
+            
+            // Show a random fun fact
+            const randomFact = funFacts[Math.floor(Math.random() * funFacts.length)];
+            funFactElement.textContent = randomFact;
+        }
+
+        // Restart the game
+        function restartGame() {
+            showPage(introPage);
+        }
+
+        // Update the score display
+        function updateScore() {
+            scoreElement.textContent = score;
+        }
+
+        // Show a specific page and hide others
+        function showPage(pageToShow) {
+            // Hide all pages
+            introPage.classList.remove('active');
+            gamePage.classList.remove('active');
+            resultsPage.classList.remove('active');
+            
+            // Show selected page
+            pageToShow.classList.add('active');
+        }
+    </script>
+</body>
+</html>
